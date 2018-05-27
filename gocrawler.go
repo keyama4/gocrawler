@@ -6,24 +6,16 @@ import (
 )
 
 // CrawlOnChrome is crawling with common process on chrome driver
-func CrawlOnChrome(callbacks ...func(page *agouti.Page)) {
-	driver := agouti.ChromeDriver()
-	if err := driver.Start(); err != nil {
-		log.Fatalf("Failed to start driver:%v", err)
-	}
-	defer driver.Stop()
-	page, err := driver.NewPage()
-	if err != nil {
-		log.Fatalf("Failed to open page:%v", err)
-	}
-	for _, callback := range callbacks {
-		callback(page)
-	}
+func CrawlOnChrome(onCrawl func(page *agouti.Page)) {
+	crawl(agouti.ChromeDriver(), onCrawl)
 }
 
 // CrawlOnPhantom is crawling with common process on PhantomJS
-func CrawlOnPhantom(callbacks ...func(page *agouti.Page)) {
-	driver := agouti.PhantomJS()
+func CrawlOnPhantom(onCrawl func(page *agouti.Page)) {
+	crawl(agouti.PhantomJS(), onCrawl)
+}
+
+func crawl(driver *agouti.WebDriver, onCrawl func(page *agouti.Page)) {
 	if err := driver.Start(); err != nil {
 		log.Fatalf("Failed to start driver:%v", err)
 	}
@@ -32,7 +24,5 @@ func CrawlOnPhantom(callbacks ...func(page *agouti.Page)) {
 	if err != nil {
 		log.Fatalf("Failed to open page:%v", err)
 	}
-	for _, callback := range callbacks {
-		callback(page)
-	}
+	onCrawl(page)
 }
